@@ -10,4 +10,4 @@ a simple RPG for the spreadsheets
 - Pweorful enmedies to fightt
 - Save the x-el land and defeat the boss PAPERCLIP
 - No saving your game BCUZ
-- advance enomie AY-I
+- advance enomey AY-I
