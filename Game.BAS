@@ -285,6 +285,7 @@ Sub Reset()
     GameSheet.cmdUp.Visible = False
     GameSheet.cmdLeft.Visible = False
     GameSheet.cmdRight.Visible = False
+    GameSheet.cmdInventory.Visible = False
     
     strPlayerName = ""
     intPlayerHP = 0
