@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} FrmBattle 
    Caption         =   "BATTLE LOG"
-   ClientHeight    =   6105
+   ClientHeight    =   7080
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   9750
+   ClientWidth     =   9630
    OleObjectBlob   =   "FrmBattle.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -26,13 +26,12 @@ Private Sub cmdContinue_Click()
 End Sub
 
 Public Sub StartUp()
-    turn = 1
+    turn = 0
     TxtBattleLog.Text = ""
 End Sub
 
 Public Sub WriteLine(ln As String)
     TxtBattleLog.Text = TxtBattleLog.Text & vbCrLf & "Turn #" & turn & ": " & ln & vbCrLf
-    TxtBattleLog.SelStart = Len(TxtBattleLog.Text)
 End Sub
 
 Public Sub WriteHealthBar(hp As Integer, maxHp As Integer, name As String)
@@ -51,11 +50,11 @@ Public Sub WriteHealthBar(hp As Integer, maxHp As Integer, name As String)
     Next i
 
     TxtBattleLog.Text = TxtBattleLog.Text & vbCrLf & name & " HP" & ": " & vbCrLf & healthBar & " (" & hp & " / " & maxHp & ")" & vbCrLf
-    TxtBattleLog.SelStart = Len(TxtBattleLog.Text)
 End Sub
 
 Public Sub NextTurn()
     turn = turn + 1
+    TxtBattleLog.Text = ""
 End Sub
 
 Private Sub UserForm_Terminate()

@@ -33,7 +33,7 @@ Const MAP_HEIGHT = 50
 Const NAME_BOSS = "boss"
 Const NAME_GIBS = "gibs"
 
-Const XP_PER_LEVEL = 10
+Const XP_PER_LEVEL = 100
 Const HP_PER_LEVEL = 10
 
 Const PERCENT_OF_BATTLE = 40
@@ -130,6 +130,7 @@ End Sub
 Sub RunGame()
     Call CheckAdjecentTiles
     Call DrawGameMap
+    DrawScene strWepName, "pickups"
 End Sub
 
 Sub DrawGameMap()
@@ -143,9 +144,9 @@ Sub DrawGibs()
 End Sub
 
 Sub LevelUp()
-    intPlayerXP = intPlayerXP + Int((10) * Rnd + 1)
+    intPlayerXP = intPlayerXP + Int((XP_PER_LEVEL * intPlayerLevel) * Rnd + 1)
     
-    If intPlayerXP >= intPlayerLevel * XP_PER_LEVEL Then
+    If intPlayerXP >= (intPlayerLevel * XP_PER_LEVEL) Then
         MsgBox "You have levellled OOP!", vbInformation, "YAY"
         intPlayerLevel = intPlayerLevel + 1
         intPlayerAtk = intPlayerAtk * intPlayerLevel
@@ -199,7 +200,7 @@ Sub RandomEncounter()
         
         'figure out what this random encounter will be
         Dim whichEnemy As Integer
-        whichEnemy = Int((COUNT_ENEMIES) * Rnd + 1)
+        whichEnemy = Int((COUNT_ENEMIES) * Rnd)
         Dim strEnemyName As String
         strEnemyName = arrEnemies(whichEnemy)
     
@@ -233,9 +234,11 @@ Sub RandomEncounter()
         
         'main battle loop, keep going until someone is TOAST
         Do Until enemyHP <= 0 Or intPlayerHP <= 0
+            Call FrmBattle.NextTurn
+        
             'the player's attack
             dmgFromPlayer = Int((intPlayerAtk) * Rnd + 1)
-            enemyDefended = Int((enemyDEF) * Rnd)
+            enemyDefended = Int((dmgFromPlayer) * Rnd)
             enemyHP = (enemyHP - dmgFromPlayer) + enemyDefended
             FrmBattle.WriteLine "You did " & dmgFromPlayer & " damage with Weapon " & UCase(strWepName) & "!"
             
@@ -249,9 +252,9 @@ Sub RandomEncounter()
             
             'the enemy attack
             dmgFromEnemy = Int((enemyATK) * Rnd + 1)
-            playerDefended = Int((intPlayerDef) * Rnd)
+            playerDefended = Int((dmgFromEnemy) * Rnd)
             intPlayerHP = (intPlayerHP - dmgFromEnemy) + playerDefended
-            FrmBattle.WriteLine "Enemy " & UCase(strEnemyName) & " did " & dmgFromPlayer & " damage to you!"
+            FrmBattle.WriteLine "Enemy " & UCase(strEnemyName) & " did " & dmgFromEnemy & " damage to you!"
             
             If playerDefended > 0 Then
                 FrmBattle.WriteLine "You managed to block " & playerDefended & " damage though!"
@@ -261,7 +264,6 @@ Sub RandomEncounter()
             
             GameSheet.LblHP = intPlayerHP
             
-            Call FrmBattle.NextTurn
             Call FrmBattle.Show
         Loop
         
@@ -276,6 +278,7 @@ Sub RandomEncounter()
         Else
             MsgBox "U r DED. Plz play again. Or Not. I dno", vbInformation, "OH NO"
             Call Reset
+            End
         End If
         
         'loot that you could pickup
