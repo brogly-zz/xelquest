@@ -36,12 +36,17 @@ Const NAME_GIBS = "gibs"
 Const XP_PER_LEVEL = 10
 Const HP_PER_LEVEL = 10
 
+Const PERCENT_OF_BATTLE = 40
+
 Sub StartGame_Click()
     Call Main
 End Sub
 
 'main entry point of the model
 Sub Main()
+
+    'get different values from Rnd each time
+    Randomize
 
     'put all the names of enemies in an array for random encounters
     arrEnemies = Array("ai", "bsod", "document", "error", "paperclip", "pie", "user friendly interface")
@@ -66,6 +71,7 @@ Sub Reset()
     GameSheet.LblSTR = ""
     GameSheet.LblDEF = ""
     GameSheet.LblLevel = ""
+    GameSheet.LblXP = ""
     GameSheet.ImgFace.Picture = Nothing
     GameSheet.ImgAccessory.Picture = Nothing
     GameSheet.ImgHair.Picture = Nothing
@@ -130,7 +136,6 @@ Sub DrawGameMap()
     Dim tileName As String
     tileName = GameMap.Cells(intCurRowY, intCurColX).Value
     DrawScene tileName
-    DrawScene strWepName, "pickups"
 End Sub
 
 Sub DrawGibs()
@@ -156,6 +161,7 @@ Sub GoUp()
     Call CheckAdjecentTiles
     Call RandomEncounter
     Call UpdateLabels
+    DrawScene strWepName, "pickups"
 End Sub
 
 Sub GoDown()
@@ -164,6 +170,7 @@ Sub GoDown()
     Call CheckAdjecentTiles
     Call RandomEncounter
     Call UpdateLabels
+    DrawScene strWepName, "pickups"
 End Sub
 
 Sub GoLeft()
@@ -172,6 +179,7 @@ Sub GoLeft()
     Call CheckAdjecentTiles
     Call RandomEncounter
     Call UpdateLabels
+    DrawScene strWepName, "pickups"
 End Sub
 
 Sub GoRight()
@@ -180,13 +188,14 @@ Sub GoRight()
     Call CheckAdjecentTiles
     Call RandomEncounter
     Call UpdateLabels
+    DrawScene strWepName, "pickups"
 End Sub
 
 Sub RandomEncounter()
     Dim chance As Integer
     chance = Int((100) * Rnd + 1)
     
-    If chance < 40 Then
+    If chance < PERCENT_OF_BATTLE Then
         
         'figure out what this random encounter will be
         Dim whichEnemy As Integer
@@ -199,11 +208,17 @@ Sub RandomEncounter()
         'draw the enemy graphics on top of everything else
         DrawScene strEnemyName, "enemies"
         
+        'draw weapon on top of enemy
+        DrawScene strWepName, "pickups"
+        
         'enemy stats
         Dim enemyHP As Integer
+        Dim enemyMaxHP As Integer
         Dim enemyATK As Integer
         Dim enemyDEF As Integer
-        enemyHP = Int((intPlayerHP) * Rnd + 1)
+        
+        enemyHP = Int((HP_PER_LEVEL * intPlayerLevel) * Rnd + 1)
+        enemyMaxHP = enemyHP
         enemyATK = Int((intPlayerAtk) * Rnd + 1)
         enemyDEF = Int((intPlayerDef) * Rnd + 1)
         
@@ -213,14 +228,22 @@ Sub RandomEncounter()
         Dim enemyDefended As Integer
         Dim playerDefended As Integer
         
+        Call FrmBattle.StartUp
+        FrmBattle.WriteHealthBar intPlayerHP, HP_PER_LEVEL * intPlayerLevel, strPlayerName
+        
         'main battle loop, keep going until someone is TOAST
         Do Until enemyHP <= 0 Or intPlayerHP <= 0
             'the player's attack
             dmgFromPlayer = Int((intPlayerAtk) * Rnd + 1)
             enemyDefended = Int((enemyDEF) * Rnd)
             enemyHP = (enemyHP - dmgFromPlayer) + enemyDefended
-            MsgBox "You did " & dmgFromPlayer & " damage with Weapon " & UCase(strWepName) & "!", vbInformation, "BATTLE"
-            MsgBox "Enemy" & UCase(strEnemyName) & " managed to block " & enemyDefended & " damage though!", vbInformation, "BATTLE"
+            FrmBattle.WriteLine "You did " & dmgFromPlayer & " damage with Weapon " & UCase(strWepName) & "!"
+            
+            If enemyDefended > 0 Then
+                FrmBattle.WriteLine "Enemy" & UCase(strEnemyName) & " managed to block " & enemyDefended & " damage though!"
+            End If
+            
+            FrmBattle.WriteHealthBar enemyHP, enemyMaxHP, strEnemyName
             
             If enemyHP <= 0 Then Exit Do
             
@@ -228,10 +251,18 @@ Sub RandomEncounter()
             dmgFromEnemy = Int((enemyATK) * Rnd + 1)
             playerDefended = Int((intPlayerDef) * Rnd)
             intPlayerHP = (intPlayerHP - dmgFromEnemy) + playerDefended
-            MsgBox "Enemy " & UCase(strEnemyName) & " did " & dmgFromPlayer & " damage to you!", vbInformation, "BATTLE"
-            MsgBox "You managed to block " & playerDefended & " damage though!", vbInformation, "BATTLE"
+            FrmBattle.WriteLine "Enemy " & UCase(strEnemyName) & " did " & dmgFromPlayer & " damage to you!"
+            
+            If playerDefended > 0 Then
+                FrmBattle.WriteLine "You managed to block " & playerDefended & " damage though!"
+            End If
+            
+            FrmBattle.WriteHealthBar intPlayerHP, HP_PER_LEVEL * intPlayerLevel, strPlayerName
             
             GameSheet.LblHP = intPlayerHP
+            
+            Call FrmBattle.NextTurn
+            Call FrmBattle.Show
         Loop
         
         'check who won
@@ -240,6 +271,7 @@ Sub RandomEncounter()
             MsgBox "You WINNED!", vbInformation, "BATTLE WINNED!"
             Call DrawGameMap
             Call DrawGibs
+            DrawScene strWepName, "pickups"
             Call LevelUp
         Else
             MsgBox "U r DED. Plz play again. Or Not. I dno", vbInformation, "OH NO"
@@ -252,7 +284,7 @@ Sub RandomEncounter()
 End Sub
 
 Sub Loot()
-    
+    'TODO
 End Sub
 
 Sub CheckAdjecentTiles()
