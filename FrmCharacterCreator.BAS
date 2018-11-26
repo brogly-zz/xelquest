@@ -13,6 +13,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'Author: Chris Brogly
+'Description: Simple RPG in Excel
+'Purpose: I dno?
+'See LICENSE file (Apache 2.0)
+
 Option Explicit
 
 Public idxFace As Integer
@@ -85,6 +90,7 @@ Private Sub cmdStart_Click()
     
     SetupCharacterPic
     Unload Me
+    
 End Sub
 
 Private Sub UserForm_Initialize()

@@ -15,17 +15,36 @@ Public intPlayerAtk As Integer
 Public intPlayerDef As Integer
 Public strWepName As String
 Public intWepStr As Integer
+Public intPotionCount As Integer
 
 'player position on the game map
 'added X/Y since these are sort of like pixels
 Public intCurColX As Integer
 Public intCurRowY As Integer
 
+'names of all of the enemy graphics
+Public arrEnemies As Variant
+
+'useful constants
+Const COUNT_ENEMIES = 7
 Const MAP_WIDTH = 50
 Const MAP_HEIGHT = 50
 
+Const NAME_BOSS = "boss"
+Const NAME_GIBS = "gibs"
+
+Const XP_PER_LEVEL = 10
+Const HP_PER_LEVEL = 10
+
+Sub StartGame_Click()
+    Call Main
+End Sub
+
 'main entry point of the model
 Sub Main()
+
+    'put all the names of enemies in an array for random encounters
+    arrEnemies = Array("ai", "bsod", "document", "error", "paperclip", "pie", "user friendly interface")
     
     'abstract the implementation of key features by organizing them into subs
     Call Reset
@@ -33,27 +52,66 @@ Sub Main()
     Call SetupGameScreen
     Call FrmCharacterCreator.Show
     Call CreateGameWorld
+    Call UpdateLabels
     Call RunGame
+    
+    GameSheet.cmdInventory.Visible = True
 
+End Sub
+
+'reset the graphics/player values
+Sub Reset()
+    GameSheet.LblHeroName = ""
+    GameSheet.LblHP = ""
+    GameSheet.LblSTR = ""
+    GameSheet.LblDEF = ""
+    GameSheet.LblLevel = ""
+    GameSheet.ImgFace.Picture = Nothing
+    GameSheet.ImgAccessory.Picture = Nothing
+    GameSheet.ImgHair.Picture = Nothing
+    
+    GameSheet.cmdDown.Visible = False
+    GameSheet.cmdUp.Visible = False
+    GameSheet.cmdLeft.Visible = False
+    GameSheet.cmdRight.Visible = False
+    GameSheet.cmdInventory.Visible = False
+    
+    strPlayerName = ""
+    intPlayerHP = 0
+    intPlayerLevel = 0
+    intPlayerAtk = 0
+    intPlayerDef = 0
+    intPlayerXP = 0
+    strWepName = "slap"
+    intWepStr = 1
+    
+    intCurColX = 1
+    intCurRowY = 1
+    
+    DrawScene "title"
 End Sub
 
 'this is a comment about this sub
 Sub SetupNewPlayer()
-    strPlayerName = InputBox("Enter your name traveller (otherwise the game will crash):", "Enter your name Traveller")
+    strPlayerName = InputBox("Enter your name traveller (otherwise the game might crash):", "Enter your name Traveller")
     intPlayerHP = 10
     intPlayerLevel = 1
-    intPlayerAtk = 1
-    intPlayerDef = 1
+    intPlayerAtk = 3
+    intPlayerDef = 2
     intCurColX = 1
     intCurRowY = 1
     strWepName = "slap"
+    intPotionCount = 3
     MsgBox "Welcome to X-EL QUEST, " & strPlayerName, vbInformation, "You have started X-EL QUEST"
-    
+End Sub
+
+Sub UpdateLabels()
     GameSheet.LblHeroName = strPlayerName
     GameSheet.LblLevel = intPlayerLevel
     GameSheet.LblHP = intPlayerHP
     GameSheet.LblSTR = intPlayerAtk
     GameSheet.LblDEF = intPlayerDef
+    GameSheet.LblXP = intPlayerXP & " / " & XP_PER_LEVEL * intPlayerLevel
 End Sub
 
 Sub SetupGameScreen()
@@ -64,8 +122,8 @@ Sub SetupGameScreen()
 End Sub
 
 Sub RunGame()
-    CheckAdjecentTiles
-    DrawGameMap
+    Call CheckAdjecentTiles
+    Call DrawGameMap
 End Sub
 
 Sub DrawGameMap()
@@ -75,73 +133,126 @@ Sub DrawGameMap()
     DrawScene strWepName, "pickups"
 End Sub
 
+Sub DrawGibs()
+    DrawScene NAME_GIBS, "enemies"
+End Sub
+
+Sub LevelUp()
+    intPlayerXP = intPlayerXP + Int((10) * Rnd + 1)
+    
+    If intPlayerXP >= intPlayerLevel * XP_PER_LEVEL Then
+        MsgBox "You have levellled OOP!", vbInformation, "YAY"
+        intPlayerLevel = intPlayerLevel + 1
+        intPlayerAtk = intPlayerAtk * intPlayerLevel
+        intPlayerDef = intPlayerDef * intPlayerLevel
+        intPlayerHP = HP_PER_LEVEL * intPlayerLevel
+    End If
+End Sub
+
 'movement
 Sub GoUp()
     intCurRowY = intCurRowY - 1
-    DrawGameMap
-    CheckAdjecentTiles
-    RandomEncounter
+    Call DrawGameMap
+    Call CheckAdjecentTiles
+    Call RandomEncounter
+    Call UpdateLabels
 End Sub
 
 Sub GoDown()
     intCurRowY = intCurRowY + 1
-    DrawGameMap
-    CheckAdjecentTiles
-    RandomEncounter
+    Call DrawGameMap
+    Call CheckAdjecentTiles
+    Call RandomEncounter
+    Call UpdateLabels
 End Sub
 
 Sub GoLeft()
     intCurColX = intCurColX - 1
-    DrawGameMap
-    CheckAdjecentTiles
-    RandomEncounter
+    Call DrawGameMap
+    Call CheckAdjecentTiles
+    Call RandomEncounter
+    Call UpdateLabels
 End Sub
 
 Sub GoRight()
     intCurColX = intCurColX + 1
-    DrawGameMap
-    CheckAdjecentTiles
-    RandomEncounter
+    Call DrawGameMap
+    Call CheckAdjecentTiles
+    Call RandomEncounter
+    Call UpdateLabels
 End Sub
 
 Sub RandomEncounter()
     Dim chance As Integer
     chance = Int((100) * Rnd + 1)
+    
     If chance < 40 Then
-        MsgBox "You have encountered an enemy PAPERCLIP!"
-        DrawScene "paperclip", "enemies"
+        
+        'figure out what this random encounter will be
+        Dim whichEnemy As Integer
+        whichEnemy = Int((COUNT_ENEMIES) * Rnd + 1)
+        Dim strEnemyName As String
+        strEnemyName = arrEnemies(whichEnemy)
+    
+        MsgBox "You have encountered an enemy " & UCase(strEnemyName) & "!", vbInformation, "BATTLE"
+        
+        'draw the enemy graphics on top of everything else
+        DrawScene strEnemyName, "enemies"
         
         'enemy stats
         Dim enemyHP As Integer
         Dim enemyATK As Integer
         Dim enemyDEF As Integer
-        enemyHP = Int((20) * Rnd + 1)
-        enemyATK = Int((4) * Rnd + 1)
-        enemyDEF = Int((4) * Rnd + 1)
+        enemyHP = Int((intPlayerHP) * Rnd + 1)
+        enemyATK = Int((intPlayerAtk) * Rnd + 1)
+        enemyDEF = Int((intPlayerDef) * Rnd + 1)
         
+        'temp variables for damage values
         Dim dmgFromPlayer As Integer
         Dim dmgFromEnemy As Integer
+        Dim enemyDefended As Integer
+        Dim playerDefended As Integer
         
+        'main battle loop, keep going until someone is TOAST
         Do Until enemyHP <= 0 Or intPlayerHP <= 0
-            dmgFromPlayer = Int((4) * Rnd + 1)
-            enemyHP = enemyHP - dmgFromPlayer
-            MsgBox "You did " & dmgFromPlayer & " damage with Weapon " & UCase(strWepName) & "!"
+            'the player's attack
+            dmgFromPlayer = Int((intPlayerAtk) * Rnd + 1)
+            enemyDefended = Int((enemyDEF) * Rnd)
+            enemyHP = (enemyHP - dmgFromPlayer) + enemyDefended
+            MsgBox "You did " & dmgFromPlayer & " damage with Weapon " & UCase(strWepName) & "!", vbInformation, "BATTLE"
+            MsgBox "Enemy" & UCase(strEnemyName) & " managed to block " & enemyDefended & " damage though!", vbInformation, "BATTLE"
+            
             If enemyHP <= 0 Then Exit Do
-            dmgFromEnemy = Int((4) * Rnd + 1)
-            intPlayerHP = intPlayerHP - dmgFromEnemy
-            MsgBox "Enemy did " & dmgFromPlayer & " damage to you!"
+            
+            'the enemy attack
+            dmgFromEnemy = Int((enemyATK) * Rnd + 1)
+            playerDefended = Int((intPlayerDef) * Rnd)
+            intPlayerHP = (intPlayerHP - dmgFromEnemy) + playerDefended
+            MsgBox "Enemy " & UCase(strEnemyName) & " did " & dmgFromPlayer & " damage to you!", vbInformation, "BATTLE"
+            MsgBox "You managed to block " & playerDefended & " damage though!", vbInformation, "BATTLE"
+            
             GameSheet.LblHP = intPlayerHP
         Loop
         
+        'check who won
         If enemyHP <= 0 Then
-            MsgBox "PAPERCLIP is DED"
-            MsgBox "You WINNED!"
-            DrawGameMap
+            MsgBox UCase(strEnemyName) & " is DED", vbInformation, "YAY"
+            MsgBox "You WINNED!", vbInformation, "BATTLE WINNED!"
+            Call DrawGameMap
+            Call DrawGibs
+            Call LevelUp
         Else
-            MsgBox "U r DED. Plz play again"
-            Reset
+            MsgBox "U r DED. Plz play again. Or Not. I dno", vbInformation, "OH NO"
+            Call Reset
         End If
+        
+        'loot that you could pickup
+        Call Loot
     End If
+End Sub
+
+Sub Loot()
+    
 End Sub
 
 Sub CheckAdjecentTiles()
@@ -263,41 +374,6 @@ Sub CreateGameWorld()
     Next i
 End Sub
 
-Sub StartGame_Click()
-    Call Main
-End Sub
-
 Sub CharacterCreatorTester()
     FrmCharacterCreator.Show
-End Sub
-
-Sub Reset()
-    GameSheet.LblHeroName = ""
-    GameSheet.LblHP = ""
-    GameSheet.LblSTR = ""
-    GameSheet.LblDEF = ""
-    GameSheet.LblLevel = ""
-    GameSheet.ImgFace.Picture = Nothing
-    GameSheet.ImgAccessory.Picture = Nothing
-    GameSheet.ImgHair.Picture = Nothing
-    
-    GameSheet.cmdDown.Visible = False
-    GameSheet.cmdUp.Visible = False
-    GameSheet.cmdLeft.Visible = False
-    GameSheet.cmdRight.Visible = False
-    GameSheet.cmdInventory.Visible = False
-    
-    strPlayerName = ""
-    intPlayerHP = 0
-    intPlayerLevel = 0
-    intPlayerAtk = 0
-    intPlayerDef = 0
-    intPlayerXP = 0
-    strWepName = "slap"
-    intWepStr = 1
-    
-    intCurColX = 1
-    intCurRowY = 1
-    
-    DrawScene "title"
 End Sub
