@@ -1,6 +1,9 @@
 # xelquest
 a simple RPG for the spreadsheets
 
+# installation
+plz download the zip and enable the macros the gaem is safe you can scan
+
 # features
 - HD Ultra High-Def 64x64 graphics
 - Over 2 Colors
@@ -11,3 +14,6 @@ a simple RPG for the spreadsheets
 - Save the x-el land and defeat the boss PAPERCLIP
 - No saving your game BCUZ
 - advance enomey AY-I
+
+#license
+Apache License 2.0
