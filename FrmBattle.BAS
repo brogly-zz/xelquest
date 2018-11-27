@@ -16,8 +16,18 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private turn As Integer
+Public fled As Boolean
 
 Private Sub cmdAttemptToFlee_Click()
+    Dim chance As Integer
+    
+    If chance < 15 Then
+        'flee
+        MsgBox "You successfully fled!"
+        fled = True
+    Else
+        MsgBox "You tried to flee and didnt XD"
+    End If
     
 End Sub
 
@@ -26,6 +36,7 @@ Private Sub cmdContinue_Click()
 End Sub
 
 Public Sub StartUp()
+    fled = False
     turn = 0
     TxtBattleLog.Text = ""
 End Sub

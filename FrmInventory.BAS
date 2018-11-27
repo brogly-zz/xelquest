@@ -24,14 +24,23 @@ Public Sub ShowStuff()
     Call ShowArmor
     Call ShowWeapon
     Call ShowPotions
+    Call SetupCharacterPic
+End Sub
+
+Public Sub SetupCharacterPic()
+    ImgFace.Picture = GameSheet.ImgFace.Picture
+    ImgHair.Picture = GameSheet.ImgHair.Picture
+    ImgAccessory.Picture = GameSheet.ImgAccessory.Picture
 End Sub
 
 Private Sub ShowArmor()
-    ImgArmor.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & Game.strWepName & ".gif")
+    ImgArmor.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & Game.strArmorName & ".gif")
+    LblArmor = UCase(Game.strArmorName)
 End Sub
 
 Private Sub ShowWeapon()
-    ImgWeapon.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & Game.strArmorName & ".gif")
+    If Game.strWepName <> "slap" Then ImgWeapon.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & Game.strWepName & ".gif")
+    LblWeapon = UCase(Game.strWepName)
 End Sub
 
 Private Sub ShowPotions()
@@ -45,14 +54,25 @@ Private Sub ShowPotions()
     If Game.intPotionCount = 1 Then
         ImgPot1.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
     ElseIf Game.intPotionCount = 2 Then
+        ImgPot1.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
         ImgPot2.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
     ElseIf Game.intPotionCount = 3 Then
+        ImgPot1.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
+        ImgPot2.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
         ImgPot3.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
     ElseIf Game.intPotionCount = 4 Then
+        ImgPot1.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
+        ImgPot2.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
+        ImgPot3.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
         ImgPot4.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
     ElseIf Game.intPotionCount = 5 Then
+        ImgPot1.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
+        ImgPot2.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
+        ImgPot3.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
+        ImgPot4.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
         ImgPot5.Picture = LoadPicture(ActiveWorkbook.path & "\inventory\" & "potion" & ".gif")
     End If
+    
 End Sub
 
 Private Sub ImgPot1_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single)
@@ -60,6 +80,9 @@ Private Sub ImgPot1_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, B
         Game.intPotionCount = Game.intPotionCount - 1
         Game.intPlayerHP = Game.intPlayerLevel * Game.HP_PER_LEVEL
         ImgPot1.Picture = Nothing
+        MsgBox "MMMMM gr8 'POTION'!"
+        Me.Repaint
+        GameSheet.LblHP = Game.intPlayerHP
     End If
 End Sub
 
@@ -68,6 +91,9 @@ Private Sub ImgPot2_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, B
         Game.intPotionCount = Game.intPotionCount - 1
         Game.intPlayerHP = Game.intPlayerLevel * Game.HP_PER_LEVEL
         ImgPot2.Picture = Nothing
+        MsgBox "MMMMM gr8 'POTION'!"
+        Me.Repaint
+        GameSheet.LblHP = Game.intPlayerHP
     End If
 End Sub
 
@@ -76,6 +102,9 @@ Private Sub ImgPot3_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, B
         Game.intPotionCount = Game.intPotionCount - 1
         Game.intPlayerHP = Game.intPlayerLevel * Game.HP_PER_LEVEL
         ImgPot3.Picture = Nothing
+        MsgBox "MMMMM gr8 'POTION'!"
+        Me.Repaint
+        GameSheet.LblHP = Game.intPlayerHP
     End If
 End Sub
 
@@ -84,6 +113,9 @@ Private Sub ImgPot4_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, B
         Game.intPotionCount = Game.intPotionCount - 1
         Game.intPlayerHP = Game.intPlayerLevel * Game.HP_PER_LEVEL
         ImgPot4.Picture = Nothing
+        MsgBox "MMMMM gr8 'POTION'!"
+        Me.Repaint
+        GameSheet.LblHP = Game.intPlayerHP
     End If
 End Sub
 
@@ -92,6 +124,9 @@ Private Sub ImgPot5_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, B
         Game.intPotionCount = Game.intPotionCount - 1
         Game.intPlayerHP = Game.intPlayerLevel * Game.HP_PER_LEVEL
         ImgPot5.Picture = Nothing
+        MsgBox "MMMMM gr8 'POTION'!"
+        Me.Repaint
+        GameSheet.LblHP = Game.intPlayerHP
     End If
 End Sub
 

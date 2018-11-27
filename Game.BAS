@@ -47,12 +47,14 @@ Public Const HP_PER_LEVEL = 10
 
 'chances of events
 Public Const PERCENT_OF_BATTLE = 40
-Public Const PERCENT_OF_LOOT = 15
+Public Const PERCENT_OF_LOOT = 100
 
-Public Const LOOT_POTION = 30
-Public Const LOOT_WEAPON = 15
-Public Const LOOT_ARMOR = 5
+Public Const LOOT_POTION = 70
+Public Const LOOT_WEAPON = 40
+Public Const LOOT_ARMOR = 10
 
+Public BOSS As Boolean
+Public Const BOSS_LEVEL = 5
 
 Sub StartGame_Click()
     Call Main
@@ -68,7 +70,7 @@ Sub Main()
     arrEnemies = Array("ai", "bsod", "document", "error", "paperclip", "pie", "user friendly interface")
     
     'ditto for weapons/armor
-    arrWeapons = Array("battleaxe", "rustyshortsword", "shortsword")
+    arrWeapons = Array("battleaxe", "rusty shortsword", "shortsword")
     arrArmor = Array("boxarmor", "700mbarmor", "4gbarmor")
     
     'abstract the implementation of key features by organizing them into subs
@@ -175,6 +177,11 @@ Sub LevelUp()
         intPlayerDef = intPlayerDef * intPlayerLevel
         intPlayerHP = HP_PER_LEVEL * intPlayerLevel
     End If
+    
+    If intPlayerLevel = BOSS_LEVEL Then
+        BOSS = True
+        arrEnemies = Array("boss")
+    End If
 End Sub
 
 'movement
@@ -215,6 +222,7 @@ Sub GoRight()
 End Sub
 
 Sub RandomEncounter()
+
     Dim chance As Integer
     chance = Int((100) * Rnd + 1)
     
@@ -287,12 +295,23 @@ Sub RandomEncounter()
             GameSheet.LblHP = intPlayerHP
             
             Call FrmBattle.Show
+            If FrmBattle.fled = True Then
+                Exit Do
+            End If
         Loop
         
         'check who won
         If enemyHP <= 0 Then
             MsgBox UCase(strEnemyName) & " is DED", vbInformation, "YAY"
             MsgBox "You WINNED!", vbInformation, "BATTLE WINNED!"
+            
+            'if its BOSS time and you won, END the GAME!
+            If BOSS = True Then
+                MsgBox "You REALLY WINNED and saved the x- land from the paperclips! Gr8 JOB! PLZ PLAY AGAIN!"
+                Call Reset
+                End
+            End If
+            
             Call DrawGameMap
             Call DrawGibs
             DrawScene strWepName, "pickups"
