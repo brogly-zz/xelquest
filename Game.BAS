@@ -15,7 +15,11 @@ Public intPlayerAtk As Integer
 Public intPlayerDef As Integer
 Public strWepName As String
 Public intWepStr As Integer
+Public strArmorName As String
+
+'potions
 Public intPotionCount As Integer
+Public Const MAX_POTIONS = 5
 
 'player position on the game map
 'added X/Y since these are sort of like pixels
@@ -25,18 +29,30 @@ Public intCurRowY As Integer
 'names of all of the enemy graphics
 Public arrEnemies As Variant
 
+'names of all pickups for inventory
+Public arrWeapons As Variant
+Public arrArmor As Variant
+
 'useful constants
 Const COUNT_ENEMIES = 7
 Const MAP_WIDTH = 50
 Const MAP_HEIGHT = 50
 
-Const NAME_BOSS = "boss"
-Const NAME_GIBS = "gibs"
+Public Const NAME_BOSS = "boss"
+Public Const NAME_GIBS = "gibs"
+Public Const NAME_POTION = "potion"
 
-Const XP_PER_LEVEL = 100
-Const HP_PER_LEVEL = 10
+Public Const XP_PER_LEVEL = 100
+Public Const HP_PER_LEVEL = 10
 
-Const PERCENT_OF_BATTLE = 40
+'chances of events
+Public Const PERCENT_OF_BATTLE = 40
+Public Const PERCENT_OF_LOOT = 15
+
+Public Const LOOT_POTION = 30
+Public Const LOOT_WEAPON = 15
+Public Const LOOT_ARMOR = 5
+
 
 Sub StartGame_Click()
     Call Main
@@ -50,6 +66,10 @@ Sub Main()
 
     'put all the names of enemies in an array for random encounters
     arrEnemies = Array("ai", "bsod", "document", "error", "paperclip", "pie", "user friendly interface")
+    
+    'ditto for weapons/armor
+    arrWeapons = Array("battleaxe", "rustyshortsword", "shortsword")
+    arrArmor = Array("boxarmor", "700mbarmor", "4gbarmor")
     
     'abstract the implementation of key features by organizing them into subs
     Call Reset
@@ -90,6 +110,8 @@ Sub Reset()
     intPlayerXP = 0
     strWepName = "slap"
     intWepStr = 1
+    strArmorName = "shirt"
+    intPotionCount = 0
     
     intCurColX = 1
     intCurRowY = 1
@@ -287,7 +309,45 @@ Sub RandomEncounter()
 End Sub
 
 Sub Loot()
-    'TODO
+    Dim lootOption As VbMsgBoxResult
+    Dim chance As Integer
+    chance = Int((100) * Rnd + 1)
+   
+    Dim lootType As Integer
+    lootType = Int((100) * Rnd + 1)
+    
+    If chance < PERCENT_OF_LOOT Then
+        If lootType < LOOT_ARMOR Then
+            Dim armorFound As String
+            chance = Int((UBound(arrArmor) * Rnd))
+            armorFound = arrArmor(chance)
+            
+            lootOption = MsgBox("You have looted " & UCase(armorFound) & ". Would you like to equip it?", vbYesNo)
+            
+            'update the armor if they want it
+            If lootOption = vbYes Then
+                strArmorName = armorFound
+            End If
+        ElseIf lootType < LOOT_WEAPON Then
+            Dim wepFound As String
+            chance = Int((UBound(arrWeapons) * Rnd))
+            wepFound = arrWeapons(chance)
+            
+            lootOption = MsgBox("You have looted " & UCase(wepFound) & ". Would you like to equip it?", vbYesNo)
+            
+            'update the armor if they want it
+            If lootOption = vbYes Then
+                strWepName = wepFound
+            End If
+        ElseIf lootType < LOOT_POTION Then
+            If intPotionCount < MAX_POTIONS Then
+                MsgBox "You picked up a 'Potion'."
+                intPotionCount = intPotionCount + 1
+            Else
+                MsgBox "You picked up a 'Potion' but you can't carry anymore. Have a drink!"
+            End If
+        End If
+    End If
 End Sub
 
 Sub CheckAdjecentTiles()
