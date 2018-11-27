@@ -2,7 +2,7 @@
 a simple RPG for the spreadsheets
 
 # installation
-plz download the zip and enable the macros the gaem is safe you can scan
+Download the ZIP of all the files here. You need to enable macros to play the game.
 
 # features
 - HD Ultra High-Def 64x64 graphics
@@ -15,5 +15,5 @@ plz download the zip and enable the macros the gaem is safe you can scan
 - No saving your game BCUZ
 - advance enomey AY-I
 
-#license
+# license
 Apache License 2.0
